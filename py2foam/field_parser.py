@@ -81,6 +81,7 @@ def parse_boundary_content(content):
     for boundary, (n1, n2) in bd.items():
         pd = {}
         n = n1
+        
         while True:
             lc = content[n]
             if b'nonuniform' in lc:
@@ -93,6 +94,8 @@ def parse_boundary_content(content):
                 continue
             elif b'uniform' in lc:
                 pd[lc.split()[0]] = parse_data_uniform(content[n])
+            elif b'type' in lc:
+                pd[lc.split()[0]]=lc.split()[1][:-1]
             n += 1
             if n > n2:
                 break
@@ -197,7 +200,6 @@ def split_boundary_content(content):
             if in_boundary_field:
                 print('error, boundaryField not end with }')
             break
-
     return bd
 
 
