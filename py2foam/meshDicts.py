@@ -9,7 +9,8 @@ import os
 import re
 import struct
 from collections import namedtuple
-from .field_parser import parse_internal_field, is_binary_format
+
+from .parser import parse_internal_field,is_binary_format
 
 Boundary = namedtuple('Boundary', 'type, num, start, id')
 
@@ -22,7 +23,7 @@ def is_integer(s):
         return False
 
 
-class FoamMesh(object):
+class foamMesh(object):
     """ FoamMesh class """
     def __init__(self, path):
         self.path = os.path.join(path, "constant/polyMesh/")
