@@ -6,14 +6,14 @@ from lark import Lark, Transformer, v_args
 
 _foam_comment= [
             "/*--------------------------------*- C++ -*----------------------------------*\\",
-            "  =========                   |",
+            "  ==========                |",
             "  \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox",
             "   \\\\    /   O peration     | Website:  https://openfoam.org",
             "    \\\\  /    A nd           | Version:  6",
             "     \\\\/     M anipulation  |",
             "\*---------------------------------------------------------------------------*/",
-            "         Created by py2foam:  https://github.com/BinWang0213/py2foam     ",
-            "\*---------------------------------------------------------------------------*/\n\n"
+            "/*         Created by py2foam:  https://github.com/BinWang0213/py2foam       */",
+            "/*---------------------------------------------------------------------------*/\n\n"
         ]
 foam_comment="\n".join(_foam_comment)
 
@@ -26,7 +26,7 @@ def parseFoamDict(string):
                     propagate_positions=False,
                     maybe_placeholders=False,
                     transformer=TreeToDict())
-    
+    #print(_removeComments(string))
     return parser.parse(_removeComments(string))
 
 def printdict(d, indent=0):
@@ -68,17 +68,13 @@ field_grammar = r"""
     number : SIGNED_NUMBER
     var : CNAME
     string : ESCAPED_STRING
-    dtype_string : DATA_TYPE
     
     fieldvalue : number | "(" [number (number)*] ")"
     field_uniform : var fieldvalue
-    field_nonuniform : var var dtype_string number fieldvalue
+    field_nonuniform : var var number fieldvalue
 
-    DATA_TYPE : ("<"|LETTER|">") ("<"|">"|LETTER|DIGIT)*
-    CNAME: ("_"|LETTER|".") ("_"|"."|LETTER|DIGIT)*
+    CNAME : /[a-zA-Z0-9._<>]+/
     %import common.ESCAPED_STRING
-    %import common.LETTER
-    %import common.DIGIT
     %import common.SIGNED_NUMBER
     %import common.WS
     %ignore WS
@@ -88,10 +84,6 @@ class TreeToDict(Transformer):
     @v_args(inline=True)
     def string(self, s):
         return s[1:-1]
-    
-    @v_args(inline=True)
-    def dtype_string(self, s): 
-        return str(s)[1:-1]
 
     @v_args(inline=True)
     def var(self, s):
